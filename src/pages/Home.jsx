@@ -10,6 +10,7 @@ import Spinner from "../components/Spinner";
 
 function Home() {
   const [query, setQuery] = useState("");
+  const [allRecipes, setAllRecipes] = useState([]);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -23,6 +24,8 @@ function Home() {
       try {
         // Get all recipes
         const recipes = await getAllRecipes();
+
+        setAllRecipes(recipes);
         setResults(recipes);
 
         // Get 3 random recipes
@@ -49,6 +52,9 @@ function Home() {
           "Featured recipes:",
           featuredRecipes,
         );
+
+        const API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
+        console.log("API_KEY:", API_KEY);
       } catch (error) {
         console.error(error);
         setError(error.message);
@@ -62,15 +68,19 @@ function Home() {
   async function handleSearch(e) {
     e.preventDefault();
 
-    if (!query.trim()) return;
+    setError("");
+
+    if (!query.trim()) {
+      setResults(allRecipes);
+      return;
+    }
 
     setLoading(true);
-    setError("");
 
     try {
       const meals = await searchRecipesByName(query);
-      setResults(meals);
-      console.log("Search results:", meals);
+
+      setResults(meals || []);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -149,9 +159,16 @@ function Home() {
         {!loading && results !== null && (
           <>
             <h2 className="mb-4 text-center">
-              {results.length > 0 ? "Results" : "No recipes found"}
+              {results.length > 0 ? "Recipes" : "No recipes found"}
             </h2>
-            <RecipeGrid recipes={results} />
+
+            {results.length > 0 ? (
+              <RecipeGrid recipes={results} />
+            ) : (
+              <p className="text-center text-muted">
+                Try searching for another recipe.
+              </p>
+            )}
           </>
         )}
 

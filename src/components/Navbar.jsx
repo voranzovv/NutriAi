@@ -6,7 +6,7 @@ function Navbar() {
     <nav className="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
       <div className="container">
         <NavLink className="navbar-brand fw-bold" to="/">
-          🥗 NutriAI
+          NutriAI
         </NavLink>
 
         <button

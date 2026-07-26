@@ -61,12 +61,12 @@ export async function getRecipeById(id) {
   return data.meals ? data.meals[0] : null;
 }
 
-export async function getIngredientsList(recipe) {
+export function getIngredientsList(recipe) {
   let ingredients = [];
   for (let i = 1; i <= 20; i++) {
     const ingredient = recipe[`strIngredient${i}`];
     const measure = recipe[`strMeasure${i}`];
-    if (ingredient && measure) {
+    if (ingredient) {
       //create object
       ingredients.push({ ingredient, measure });
     }
