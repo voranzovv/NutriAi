@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 
 import { getRecipeById, getIngredientsList } from "../services/mealApi";
-
 import { analyzeRecipeWithAI } from "../services/aiApi";
 
 import Spinner from "../components/Spinner";
 import ErrorMessage from "../components/ErrorMessage";
+
 import ReactMarkdown from "react-markdown";
 
 function RecipeDetails() {
@@ -34,7 +34,7 @@ function RecipeDetails() {
         if (data) {
           setRecipe(data);
 
-          const ingredientList = getIngredientsList(data);
+          const ingredientList = await getIngredientsList(data);
 
           setIngredients(ingredientList);
 
@@ -52,10 +52,13 @@ function RecipeDetails() {
     loadRecipe();
   }, [id]);
 
-  // AI Analyze function
+  // AI Analyze
   async function handleAnalyze() {
+    if (loadingAI) return;
+
     try {
       setLoadingAI(true);
+      setError("");
       setAnalysis("");
 
       const result = await analyzeRecipeWithAI({
@@ -83,7 +86,7 @@ function RecipeDetails() {
     );
   }
 
-  if (error) {
+  if (error && !recipe) {
     return (
       <div className="container py-5">
         <ErrorMessage message={error} />
@@ -95,8 +98,8 @@ function RecipeDetails() {
 
   return (
     <div className="container py-5">
-      <Link to="/" className="btn btn-link mb-4">
-        ← Back to Recipes
+      <Link to="/" className="btn btn-link mb-4 text-decoration-none">
+        Back to Recipes
       </Link>
 
       <div className="row g-4">
@@ -106,16 +109,16 @@ function RecipeDetails() {
           <img
             src={recipe.strMealThumb}
             alt={recipe.strMeal}
-            className="img-fluid rounded shadow"
+            className="img-fluid rounded shadow w-100"
           />
         </div>
 
-        {/* Details */}
+        {/* Recipe Details */}
 
         <div className="col-lg-6">
-          <h1 className="fw-bold">{recipe.strMeal}</h1>
+          <h1 className="fw-bold mb-3">{recipe.strMeal}</h1>
 
-          <div className="mb-3">
+          <div className="mb-4">
             <span className="badge bg-success me-2">{recipe.strCategory}</span>
 
             <span className="badge bg-secondary">{recipe.strArea}</span>
@@ -125,7 +128,7 @@ function RecipeDetails() {
 
           <div className="card shadow-sm">
             <div className="card-body">
-              <h4>Ingredients</h4>
+              <h4 className="mb-3">Ingredients</h4>
 
               <ul className="list-group list-group-flush">
                 {ingredients.map(({ ingredient, measure }, index) => (
@@ -153,6 +156,7 @@ function RecipeDetails() {
               <p
                 style={{
                   whiteSpace: "pre-line",
+                  lineHeight: "1.8",
                 }}
               >
                 {recipe.strInstructions}
@@ -161,26 +165,63 @@ function RecipeDetails() {
           </div>
         </div>
 
-        {/* AI Button */}
+        {/* AI Analyze Button */}
 
-        <button
-          className="btn btn-success mb-4"
-          onClick={handleAnalyze}
-          disabled={loadingAI}
-        >
-          {loadingAI ? "Analyzing..." : "Analyze with AI"}
-        </button>
+        {!analysis && (
+          <div className="col-12">
+            <button
+              className="btn btn-success btn-lg"
+              onClick={handleAnalyze}
+              disabled={loadingAI}
+            >
+              🤖 Analyze with AI
+            </button>
+          </div>
+        )}
+
+        {/* AI Loading */}
+
+        {loadingAI && (
+          <div className="col-12">
+            <div className="card shadow-sm border-success">
+              <div className="card-body text-center py-5">
+                <div
+                  className="spinner-border text-success mb-4"
+                  style={{
+                    width: "3rem",
+                    height: "3rem",
+                  }}
+                  role="status"
+                >
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+
+                <h4 className="fw-bold">NutriAI is analyzing your recipe...</h4>
+
+                <p className="text-muted mb-1">
+                  Checking ingredients, nutrition, and healthier alternatives.
+                </p>
+
+                <small className="text-secondary">
+                  This usually takes 1–3 minutes.
+                </small>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* AI Result */}
 
         {analysis && (
-          <div className="card shadow mt-4">
-            <div className="card-header bg-success text-white">
-              <h3>AI Health Analysis</h3>
-            </div>
+          <div className="col-12">
+            <div className="card shadow border-success">
+              <div className="card-header bg-success text-white">
+                <h3 className="mb-0">🤖 AI Health Analysis</h3>
+              </div>
 
-            <div className="card-body">
-              <ReactMarkdown>{analysis}</ReactMarkdown>
+              <div className="card-body">
+                <ReactMarkdown>{analysis}</ReactMarkdown>
+              </div>
             </div>
           </div>
         )}
