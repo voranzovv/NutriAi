@@ -174,7 +174,7 @@ function RecipeDetails() {
               onClick={handleAnalyze}
               disabled={loadingAI}
             >
-              🤖 Analyze with AI
+              Analyze with AI
             </button>
           </div>
         )}
