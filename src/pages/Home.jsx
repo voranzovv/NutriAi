@@ -94,7 +94,7 @@ function Home() {
 
     try {
       const meal = await getRandomRecipe();
-      console.log("Random recipe:", meal); // temporary - real display comes in Step 4
+      console.log("Random recipe:", meal);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -147,8 +147,8 @@ function Home() {
 
           {!loading && !error && results.length > 0 && (
             <p className="mt-3 mb-0">
-              Found {results.length} recipe(s) — check the console for now
-              (display coming in Step 4)
+              Found {results.length} recipe
+              {results.length === 1 ? "" : "s"}
             </p>
           )}
         </div>

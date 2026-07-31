@@ -216,7 +216,7 @@ function RecipeDetails() {
           <div className="col-12">
             <div className="card shadow border-success">
               <div className="card-header bg-success text-white">
-                <h3 className="mb-0">🤖 AI Health Analysis</h3>
+                <h3 className="mb-0">AI Health Analysis</h3>
               </div>
 
               <div className="card-body">
